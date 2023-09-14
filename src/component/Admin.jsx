@@ -4,6 +4,7 @@ import Sector from './Sector';
 import FormUser from './FormUser.jsx'
 import Tables from '../util/Table';
 import Dialog from '../util/Dialog';
+import LoadingComponent from '../util/LoadingComponent';
 import DialogConfirm from '../util/DialogConfirm';
 import ValidForm from '../util/ValidateForm';
 import axios from 'axios';
@@ -13,6 +14,7 @@ function Admin() {
     const [showSuccessDialog, setShowSuccessDialog] = useState(false);
     const [showErrorDialog, setShowErrorDialog] = useState(false);
     const [showDeleteConfirmDialog, setShowDeleteConfirmDialog] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
     const [dialogMessage, setDialogMessage] = useState('');
     const [idForUpdate, setIdForUpdate] = useState('');
     const [dataForUpdate, setDataForUpdate] = useState('');
@@ -49,6 +51,7 @@ function Admin() {
 
             if (isValid) {
                 try {
+                    setIsLoading(true)
                     const response = await axios.post(
                         'https://jsd5-mock-backend.onrender.com/members',
                         setDataUser
@@ -62,6 +65,8 @@ function Admin() {
                 } catch (error) {
                     setShowErrorDialog(true);
                     setDialogMessage('An error occurred during the request.');
+                } finally {
+                    setIsLoading(false); //
                 }
             } else {
                 setShowErrorDialog(true);
@@ -92,6 +97,7 @@ function Admin() {
 
         if (isValid) {
             try {
+                setIsLoading(true);
                 const response = await axios.put(
                     'https://jsd5-mock-backend.onrender.com/members',
                     setDataUser
@@ -105,6 +111,8 @@ function Admin() {
             } catch (error) {
                 setShowErrorDialog(true);
                 setDialogMessage('An error occurred during the request.');
+            } finally {
+                setIsLoading(false); //
             }
         } else {
             setShowErrorDialog(true);
@@ -132,6 +140,7 @@ function Admin() {
 
     const handleDelete = async (id) => {
         try {
+            setIsLoading(true);
             const response = await axios.delete(
                 `https://jsd5-mock-backend.onrender.com/member/${id}`
             );
@@ -144,6 +153,8 @@ function Admin() {
         } catch (error) {
             setShowErrorDialog(true);
             setDialogMessage('An error occurred during the request.');
+        } finally {
+            setIsLoading(false); //
         }
     }
 
@@ -154,7 +165,6 @@ function Admin() {
     const handleConfirmDelete = () => {
         if (idToDelete !== null) {
             handleDelete(idToDelete)
-            console.log('confirm')
             setIdToDelete('')
         }
         setShowDeleteConfirmDialog(false);
@@ -186,20 +196,28 @@ function Admin() {
     return (
         <App>
             <div>
-                {showSuccessDialog && <Dialog message={dialogMessage} showSuccessDialog={showSuccessDialog} />}
-                {showErrorDialog && <Dialog message={dialogMessage} showErrorDialog={showErrorDialog} />}
-            </div>
-            <h1 className='text-7xl font-bold mt-20 text-center'>Generation Thailand <br /> Home-Admin Sector</h1>
-            <Sector />
-            <FormUser postData={postData} dataForUpdate={dataForUpdate} />
-            <Tables isDelete={isDelete} isPost={isPost} getData={getData} deleteData={deleteData} setShowDeleteConfirmDialog={setShowDeleteConfirmDialog} />
-            <div>
-                {showDeleteConfirmDialog && (
-                    <DialogConfirm
-                        message="Are you sure you want to delete this user?"
-                        onConfirm={handleConfirmDelete}
-                        onCancel={handleCancelDelete}
-                    />
+                {isLoading ? (
+                    <LoadingComponent />
+                ) : (
+                    <div>
+                        <div>
+                            {showSuccessDialog && <Dialog message={dialogMessage} showSuccessDialog={showSuccessDialog} />}
+                            {showErrorDialog && <Dialog message={dialogMessage} showErrorDialog={showErrorDialog} />}
+                        </div>
+                        <h1 className='text-7xl font-bold mt-20 text-center'>Generation Thailand <br /> Home-Admin Sector</h1>
+                        <Sector />
+                        <FormUser postData={postData} dataForUpdate={dataForUpdate} />
+                        <Tables isDelete={isDelete} isPost={isPost} getData={getData} deleteData={deleteData} setShowDeleteConfirmDialog={setShowDeleteConfirmDialog} />
+                        <div>
+                            {showDeleteConfirmDialog && (
+                                <DialogConfirm
+                                    message="Are you sure you want to delete this user?"
+                                    onConfirm={handleConfirmDelete}
+                                    onCancel={handleCancelDelete}
+                                />
+                            )}
+                        </div>
+                    </div>
                 )}
             </div>
         </App>
