@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import LoadingComponent from './LoadingComponent';
 import axios from 'axios';
 
-function table({ isDelete, isPost, getData, deleteData, setShowDeleteConfirmDialog }) {
+function Table({ isDelete, isPost, getData, deleteData, setShowDeleteConfirmDialog }) {
     const display = (isDelete === undefined ? true : isDelete);
     const [isLoading, setIsLoading] = useState(true);
     const [data, setData] = useState([]);
@@ -149,4 +149,4 @@ function table({ isDelete, isPost, getData, deleteData, setShowDeleteConfirmDial
     )
 }
 
-export default table
+export default Table
